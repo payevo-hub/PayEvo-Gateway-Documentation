@@ -78,6 +78,3 @@ Este componente é usado para bloquear a visualização de conteúdos sensíveis
 - `/src/components`: Componentes React customizados.
 
 - `docusaurus.config.js`: Configuração central, plugins e injeção de variáveis de ambiente.
-
-> [!IMPORTANT] 
-Aviso de Segurança: A proteção por senha no frontend é uma barreira para usuários comuns. Usuários técnicos podem encontrar a senha inspecionando o código-fonte Javascript. Nunca exponha segredos reais de infraestrutura aqui.
