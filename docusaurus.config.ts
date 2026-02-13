@@ -22,7 +22,7 @@ const config: Config = {
   // GitHub pages deployment config.
   // If you aren't using GitHub pages, you don't need these.
   organizationName: 'payevo-hub', // Usually your GitHub org/user name.
-  projectName: 'PayEvo-Gateway-Backend', // Usually your repo name.
+  projectName: 'PayEvo-Gateway-Documentation', // Usually your repo name.
 
   onBrokenLinks: 'throw',
 
