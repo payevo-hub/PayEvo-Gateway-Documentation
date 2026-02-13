@@ -1,0 +1,146 @@
+/**
+ * Any CSS included here will be global. The classic template
+ * bundles Infima by default. Infima is a CSS framework designed to
+ * work well for content-centric websites.
+ */
+
+/* You can override the default Infima variables here. */
+:root {
+  --ifm-color-primary: #EB3300;
+  --ifm-color-primary-dark: #d42f01;
+  --ifm-color-primary-darker: #EB3300;
+  --ifm-color-primary-darkest: #AD2904;
+  --ifm-color-primary-light: #EB3300;
+  --ifm-color-primary-lighter: #EB3300;
+  --ifm-color-primary-lightest: #EB3300;
+  --ifm-code-font-size: 95%;
+
+  /* Cores de input */
+  --ifm-color-input-text-border: #d4d4d4;
+
+  --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.1);
+
+  --docsearch-primary-color: #ff4b00; 
+  
+  /* Cores do Modal no modo escuro */
+  --docsearch-modal-background: #161616;
+  --docsearch-footer-background: #0e0e0e;
+  --docsearch-searchbox-background: #222;
+  --docsearch-hit-background: #222;
+  
+  /* Cores de texto e ícones */
+  --docsearch-text-color: #f5f6f7;
+  --docsearch-muted-color: #969faf;
+  --docsearch-hit-color: #f5f6f7;  
+}
+
+.DocSearch-SearchBar {
+  background-color: #f6f7f8 !important;
+  border-radius: 5px;
+}
+
+.DocSearch-Button {
+  background-color: #f6f7f8 !important;
+  border-radius: 8px;
+  border: 1px solid #dbdee1;
+  color: #1c1e21;
+}
+
+.DocSearch-Button-Key{
+  background-color: #bdbdbd !important;
+  border-radius: 4px;
+  border: 1px solid #dbdee1;
+  color: #1c1e21;
+}
+
+[data-theme='dark'] .DocSearch-SearchBar {
+  background-color: #333 !important;
+}
+
+[data-theme='dark'] .DocSearch-Button {
+  background-color: #272727 !important;
+  border: 1px solid #272727;
+  color: #e3e3e3;
+}
+
+[data-theme='dark'] .DocSearch-Button-Key {
+  background-color: #333 !important;
+  border-radius: 4px;
+  border: 1px solid #444950;
+  color: #e3e3e3;
+}
+
+.DocSearch-Button:hover {
+  border-color: #ff4b00;
+  box-shadow: none;
+}
+
+.navbar {
+  border-bottom: 3px solid #ff4b00;
+  box-shadow: none; 
+}
+
+.theme-doc-markdown {
+  padding-top: 1rem;
+}
+
+[data-theme='dark'] {
+  --ifm-color-primary: #EB3300;
+  --ifm-color-primary-dark: #b34d31;
+  --ifm-color-primary-darker: #b34d31;
+  --ifm-color-primary-darkest: #AD2904;
+  --ifm-color-primary-light: #b34d31;
+  --ifm-color-primary-lighter: #b34d31;
+  --ifm-color-primary-lightest: #b34d31;
+
+  /* Cores de input */
+  --ifm-color-input-text-border: #4b4b4b;
+
+  --docusaurus-highlighted-code-line-bg: rgba(0, 0, 0, 0.3);
+
+  /* Fundo principal (Main Content) */
+  --ifm-background-color: #0e0e0e; 
+  /* Fundo da Barra Lateral (Sidebar) */
+  --ifm-navbar-background-color: #0a0a0a;
+  --ifm-menu-color-background-active: rgba(255, 255, 255, 0.05);
+  
+  /* Cor dos cards e elementos secundários */
+  --ifm-card-background-color: #161616;
+}
+
+[data-theme='dark'] .theme-doc-sidebar-container {
+  background-color: #0a0a0a;
+  border-right: 1px solid #222;
+}
+
+/* Remove a seta de expansão e desativa o clique nos cabeçalhos de categoria */
+.menu__list-item--collapsed .menu__list {
+  display: block !important;
+}
+
+.menu__link--sublist-caret::after {
+    display: none !important;
+}
+
+.menu__link--sublist {
+  pointer-events: none; /* Desativa o clique no título da categoria */
+  cursor: default;
+}
+
+/* Estilo para os títulos das categorias (Tags do YAML) */
+.menu__link--sublist {
+  text-transform: uppercase;
+  font-size: 0.8rem;
+  color: var(--ifm-color-emphasis-600) !important;
+  margin-top: 1rem;
+  margin-bottom: 0.3rem;
+  padding-left: 0.5rem;
+}
+
+.menu__list-item-collapsible:hover {
+  background: transparent !important;
+}
+
+.openapi-explorer__form-item-input {
+  border: 1px solid var(--ifm-color-input-text-border) !important;
+}
