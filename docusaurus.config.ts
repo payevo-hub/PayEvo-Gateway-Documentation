@@ -14,10 +14,10 @@ const config: Config = {
   },
 
   // Set the production url of your site here
-  url: 'https://payevo-hub.github.io',
+  url: 'https://docs.payevo.com.br',
 
   // Set the /<baseUrl>/ pathname under which your site is served
-  baseUrl: '/PayEvo-Gateway-Documentation/',
+  baseUrl: '/',
 
   // GitHub pages deployment config.
   // If you aren't using GitHub pages, you don't need these.
