@@ -384,52 +384,7 @@ paths:
                     description: Saldo total em centavos
         '400':
           description: Requisição inválida
-
-  /advancements:
-    post:
-      tags:
-        - Financeiro
-      summary: Criar antecipação
-      description: |
-        Permite criar uma solicitação de antecipação de recebíveis.
-      operationId: criarAntecipacao
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              required:
-                - amount
-                - transactionIds
-              properties:
-                amount:
-                  type: integer
-                  description: Valor da antecipação em centavos
-                transactionIds:
-                  type: array
-                  items:
-                    type: string
-                    format: uuid
-                  description: IDs das transações a serem antecipadas
-      responses:
-        '200':
-          description: Antecipação criada com sucesso
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  id:
-                    type: string
-                    format: uuid
-                  status:
-                    type: string
-                  amount:
-                    type: integer
-        '400':
-          description: Requisição inválida
-
+  
   /company:
     get:
       tags:

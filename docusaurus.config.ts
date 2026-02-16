@@ -110,13 +110,13 @@ const config: Config = {
     },
     // Algolia search configuration
     // Habilitar quando tiver as credenciais corretas
-    // algolia: {
-    //   appId: 'SEU_APP_ID',
-    //   apiKey: 'SUA_SEARCH_API_KEY',
-    //   indexName: 'SEU_INDEX_NAME',
-    //   contextualSearch: true,
-    //   searchPagePath: 'search'
-    // },
+    algolia: {
+      appId: process.env.ALGOLIA_APP_ID,
+      apiKey: process.env.ALGOLIA_SEARCH_KEY,
+      indexName: process.env.ALGOLIA_INDEX_NAME,
+      contextualSearch: true,
+      searchPagePath: 'search'
+    },
   } satisfies Preset.ThemeConfig,
 };
 
