@@ -48,7 +48,7 @@ paths:
     post:
       tags:
         - Transação
-      summary: Criar transação
+      summary: Criar Transação
       description: |
         Para iniciar uma transação, utilize a rota /transactions. Esse endpoint suporta pagamentos via cartão de crédito, boleto e PIX.
       operationId: criarTransacao
@@ -87,7 +87,7 @@ paths:
     get:
       tags:
         - Transação
-      summary: Listar transações
+      summary: Listar Transações
       description: |
         Permite obter uma lista de todas as transações registradas, com possibilidade de filtragem por status e período.
       operationId: listarTransacoes
@@ -141,7 +141,7 @@ paths:
     get:
       tags:
         - Transação
-      summary: Buscar transação
+      summary: Buscar Transação
       description: |
         Permite recuperar informações sobre uma transação específica informando seu ID.
       operationId: buscarTransacao
@@ -166,7 +166,7 @@ paths:
     post:
       tags:
         - Transação
-      summary: Estornar transação
+      summary: Estornar Transação
       description: |
         Permite solicitar o estorno de uma transação já processada.
       operationId: estornarTransacao
@@ -204,7 +204,7 @@ paths:
     put:
       tags:
         - Transação
-      summary: Alterar status de entrega
+      summary: Alterar Status de Entrega
       description: |
         Permite alterar o status de entrega de uma transação específica.
       operationId: alterarStatusEntrega
@@ -240,7 +240,7 @@ paths:
     post:
       tags:
         - Clientes
-      summary: Criar cliente
+      summary: Criar Cliente
       description: |
         O endpoint /customers permite cadastrar um novo cliente na plataforma.
       operationId: criarCliente
@@ -263,7 +263,7 @@ paths:
     get:
       tags:
         - Clientes
-      summary: Listar clientes
+      summary: Listar Clientes
       description: |
         Permite obter uma lista de clientes cadastrados na plataforma, com suporte a filtros para facilitar a busca.
       operationId: listarClientes
@@ -304,7 +304,7 @@ paths:
     get:
       tags:
         - Clientes
-      summary: Buscar cliente
+      summary: Buscar Cliente
       description: |
         Permite recuperar as informações de um cliente específico cadastrado na plataforma.
       operationId: buscarCliente
@@ -329,7 +329,7 @@ paths:
     put:
       tags:
         - Clientes
-      summary: Atualizar cliente
+      summary: Atualizar Cliente
       description: |
         O endpoint /customers/{id} permite atualizar as informações de um cliente já cadastrado.
       operationId: atualizarCliente
@@ -361,7 +361,7 @@ paths:
     get:
       tags:
         - Financeiro
-      summary: Consultar saldo e reserva
+      summary: Consultar Saldo e Reserva
       description: |
         Para consultar o saldo disponível, utilize a rota `/balance`.
       operationId: consultarSaldo
@@ -389,7 +389,7 @@ paths:
     get:
       tags:
         - Conta
-      summary: Dados da empresa
+      summary: Dados da Empresa
       description: |
         O endpoint /company permite obter informações gerais sobre a empresa cadastrada na plataforma.
       operationId: dadosEmpresa
@@ -422,7 +422,7 @@ paths:
     post:
       tags:
         - Cashout
-      summary: Solicitar saque
+      summary: Solicitar Saque
       description: |
         Realizar um saque do saldo disponível para uma chave Pix.
 

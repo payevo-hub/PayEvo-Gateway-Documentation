@@ -27,7 +27,7 @@ export default function ApiItemWrapper(props: Props): ReactNode {
     props?.match?.path
   ) as string;
 
-  const isCashout = (path === "/solicitar-saque");
+  const isCashout = (path === "/solicitar-saque" || path === "/en/solicitar-saque");
 
   if (isCashout && !unlocked) {
     return (

@@ -1,0 +1,10 @@
+{
+  "logo.alt": {
+    "message": "Logo Payevo",
+    "description": "The alt text of navbar logo"
+  },
+  "item.label.Gateway": {
+    "message": "Gateway",
+    "description": "Navbar item with label Gateway"
+  }
+}

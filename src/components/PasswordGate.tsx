@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import useDocusaurusContext from '@docusaurus/useDocusaurusContext';
+import Translate, {translate} from '@docusaurus/Translate';
 
 export function PasswordGate({ onUnlock }: { onUnlock: () => void }) {
   const { siteConfig } = useDocusaurusContext();
@@ -38,21 +39,25 @@ export function PasswordGate({ onUnlock }: { onUnlock: () => void }) {
           justifyContent: "center",
         }}
       >
-        <h3>🔒 Endpoint protegido</h3>
-        <p style={{
-          marginBottom: "0rem",
-        }}>
-          Este endpoint requer uma senha para visualização.
-        </p>
+        <h3>
+          <Translate id="protected.endpoint.title">
+            🔒 Endpoint protegido
+          </Translate>
+        </h3>
         <p style={{
           marginBottom: "1rem",
-        }}>Solicite-a com o suporte.</p>
+          textAlign: "center",
+        }}>
+          <Translate id="protected.endpoint.description">
+            Este endpoint requer uma senha para visualização. Solicite-a com o suporte.
+          </Translate>
+        </p>
 
         <input
           type="password"
           value={value}
           onChange={(e) => setValue(e.target.value)}
-          placeholder="Digite a senha"
+          placeholder={translate({message: 'Digite a senha', id: 'protected.endpoint.input'})}
           style={{ width: "100%" }}
           className="openapi-explorer__form-item-input"
         />
@@ -63,16 +68,19 @@ export function PasswordGate({ onUnlock }: { onUnlock: () => void }) {
           marginBottom: 0,
           marginTop: "0.5rem",
         }}>
-          Senha incorreta
+          <Translate id="protected.endpoint.alert">
+            Senha incorreta
+          </Translate>          
         </p>
-
 
         <button 
           onClick={submit}
           className="openapi-explorer__request-btn"
           style={{ marginTop: "0.5rem" }}
         >
-          Desbloquear
+          <Translate id="protected.endpoint.button">
+            DESBLOQUEAR
+          </Translate>
         </button>
       </form>
     </div>

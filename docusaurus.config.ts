@@ -102,7 +102,7 @@ const config: Config = {
         {
           href: 'https://hub.payevo.com.br/',
           label: 'Gateway',
-          position: 'right',
+          position: 'left',
         },
 
         {
