@@ -1,0 +1,82 @@
+---
+id: formato-dos-postbacks
+title: Postback Structure
+slug: /formato-dos-postbacks
+sidebar_position: 2
+---
+
+When registering a transaction, you can define a specific URL to receive notifications whenever there are updates to the transaction status. To do this, use the `postbackUrl` field. The data sent to this URL will follow the format shown below:
+
+---
+
+Order
+
+```JSON
+{
+  "id": "XDOH3YTF9GER",
+  "type": "transaction",
+  "objectId": "c856345e-23d6-471d-bb7e-75dfe340c26d",
+  "data": {
+    "id": "c856345e-23d6-471d-bb7e-75dfe340c26d",
+    "amount": 500,
+    "refundedAmount": null,
+    "description": "Descrição",
+    "companyId": "8e34bece-fed7-4b45-b725-effe6ddef895",
+    "installments": 1,
+    "paymentMethod": "PIX",
+    "status": "waiting_payment",
+    "postbackUrl": null,
+    "metadata": "{}",
+    "createdAt": "2024-08-09T10:51:07.144-03:00",
+    "updatedAt": "2024-08-09T10:51:07.144-03:00",
+    "paidAt": null,
+    "ip": "2121.123123.1123",
+    "customer": {
+      "id": "4efd19a3-cace-4036-abee-d57fb7260f65",
+      "name": "teste",
+      "email": "teste@gmail.com",
+      "phone": "11991301322",
+      "createdAt": "2024-08-09T10:51:06.691107"
+    },
+    "card": null,
+    "boleto": null,
+    "pix": {
+      "qrcode": "https://digital.mundipagg.com/pix/",
+      "expirationDate": "2024-08-09T11:11:07.144-03:00",
+      "end2EndId": null,
+      "receiptUrl": null
+    },
+    "shipping": {
+      "neighborhood": "Ilhinha",
+      "zipCode": "65076632",
+      "city": "São Luís",
+      "complement": "casa",
+      "streetNumber": "165",
+      "street": "Rua São Jorge",
+      "state": "MA"
+    },
+    "refusedReason": null,
+    "items": [
+      {
+        "title": "Teste 2",
+        "unitPrice": 500,
+        "quantity": 1,
+        "externalRef": "teste"
+      }
+    ],
+    "splits": [
+      {
+        "recipientId": "909c81fe-0511-442c-b2a8-ca06b0fd8042",
+        "percentage": 100,
+        "netAmount": 200
+      }
+    ],
+    "fee": {
+      "fixedAmount": 3,
+      "spreadPercentage": 3,
+      "estimatedFee": 300,
+      "netAmount": 200
+    }
+  }
+}
+```

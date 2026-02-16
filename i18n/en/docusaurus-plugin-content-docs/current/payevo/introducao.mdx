@@ -1,0 +1,31 @@
+---
+id: introducao
+title: Getting Started
+slug: /
+---
+
+# PayEvo Gateway API
+
+#### REST API for integration with the PayEvo payment gateway.
+
+---
+    
+The API was designed based on REST architecture, ensuring that all responses are returned in JSON format.
+    
+To access the API resources, you must authenticate using the **Basic Authentication** method, providing your secret key as a credential.
+
+Your authentication keys can be found in the control panel by navigating to **Settings → API Credentials**.
+
+After obtaining your key, include it in the request header in the Authorization field, according to the structure shown below:
+
+**Example**
+
+```javascript
+const options = {
+    method: "POST",
+    url: "https://apiv2.payevo.com.br/functions/v1/transactions",
+    headers: {
+        authorization: 'Basic ' + new Buffer("{SECRET_KEY}").toString('base64')
+    }
+}
+```

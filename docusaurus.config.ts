@@ -56,15 +56,24 @@ const config: Config = {
         id: "api", 
         docsPluginId: "classic",
         config: {
-          payevo: {
-            specPath: "openapi.yaml", // Caminho para o arquivo YAML
-            outputDir: "docs", // Onde as páginas geradas ficarão
+          payevo: { // versão padrão (português)
+            specPath: "openapi.yaml",
+            outputDir: "docs", 
             sidebarOptions: {
               groupPathsBy: "tag",
               categoryLinkSource: undefined,
               sidebarCollapsed: false,
             },
-          }
+          },
+          payevo_en: { // versão em inglês
+            specPath: 'openapi-en.yaml',
+            outputDir: 'i18n/en/docusaurus-plugin-content-docs/current/',
+            sidebarOptions: {
+              groupPathsBy: "tag",
+              categoryLinkSource: undefined,
+              sidebarCollapsed: false,
+            },
+          },
         }
       },
     ],
@@ -73,7 +82,6 @@ const config: Config = {
   themes: ['docusaurus-theme-openapi-docs'], // Habilita a interface visual de API
 
   customFields: {
-    // Isso injeta a variável do seu .env para dentro do Docusaurus
     cashoutPassword: process.env.CASHOUT_PASSWORD,
   },
 
@@ -97,11 +105,10 @@ const config: Config = {
           position: 'right',
         },
 
-        // Desabilitado temporariamente
-        // {
-        //   type: 'localeDropdown',
-        //   position: 'right',
-        // },
+        {
+          type: 'localeDropdown',
+          position: 'right',
+        },
       ],
     },
     prism: {
@@ -109,7 +116,6 @@ const config: Config = {
       darkTheme: prismThemes.vsDark
     },
     // Algolia search configuration
-    // Habilitar quando tiver as credenciais corretas
     algolia: {
       appId: process.env.ALGOLIA_APP_ID,
       apiKey: process.env.ALGOLIA_SEARCH_KEY,

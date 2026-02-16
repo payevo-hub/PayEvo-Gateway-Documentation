@@ -1,0 +1,856 @@
+openapi: 3.0.3
+info:
+  title: PayEvo Gateway API
+  description: |
+    REST API for integration with the PayEvo payment gateway.
+
+    ---
+    
+    The API was designed based on REST architecture, ensuring that all responses are returned in JSON format.
+    
+    To access the API resources, you must authenticate using the **Basic Authentication** method, providing your secret key as a credential.
+    
+    Your authentication keys can be found in the control panel by navigating to **Settings → API Credentials**.
+
+    After obtaining your key, include it in the request header in the Authorization field, according to the structure shown below:
+    
+    ## Postbacks
+
+    When registering a transaction, you can define a specific URL to receive notifications whenever there are updates to the transaction status. To do this, use the `postbackUrl` field when creating the transaction. The data sent to this URL will follow the `Postback` schema format.
+
+  version: 2.1.0
+
+servers:
+  - url: http://apiv2.payevo.com.br/functions/v1
+    description: Servidor de produção
+
+security:
+  - basicAuth: []
+  # - BearerAuth: []
+
+tags:
+  - name: PayEvo
+    description: General instructions and information about the PayEvo platform
+  - name: Transaction
+    description: Endpoints for managing payment transactions
+  - name: Customers
+    description: Endpoints for managing customers
+  - name: Financial
+    description: Endpoints for balance inquiries and advances
+  - name: Account
+    description: Endpoints for account and company information
+  - name: Cashout
+    description: Endpoints for managing withdrawals and transfers
+  - name: Webhooks
+    description: Endpoints for configuring and managing webhooks
+
+paths:
+  /transactions:
+    post:
+      tags:
+        - Transaction
+      summary: Create transaction
+      description: |
+        To initiate a transaction, use the /transactions route. This endpoint supports payments via credit card, boleto, and PIX.
+      operationId: criarTransacao
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CriarTransacaoRequest'
+            example:
+              card:
+                hash: "token_do_cartao_tokenizado"
+              customer:
+                name: "João Silva"
+                email: "joao@email.com"
+                document:
+                  type: "CPF"
+                  number: "12345678900"
+              amount: 5000
+              paymentMethod: "CARD"
+              installments: 1
+      responses:
+        '200':
+          description: Transaction created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Transaction'
+        '400':
+          description: Invalid request
+        '401':
+          description: Unauthorized
+        '500':
+          description: Internal Server Error
+
+    get:
+      tags:
+        - Transaction
+      summary: List Transaction
+      description: |
+        Allows you to obtain a list of all recorded transactions, with the possibility of filtering by status and period.
+      operationId: listarTransacoes
+      parameters:
+        - name: status
+          in: query
+          description: Filter by transaction status
+          schema:
+            type: string
+            enum: [processing, authorized, paid, refunded, waiting_payment, refused, chargedback, canceled, in_protest, partially_paid]
+        - name: startDate
+          in: query
+          description: Initial date for filtering (ISO 8601 format)
+          schema:
+            type: string
+            format: date-time
+        - name: endDate
+          in: query
+          description: Final date for filtering (ISO 8601 format)
+          schema:
+            type: string
+            format: date-time
+        - name: page
+          in: query
+          description: Page number
+          schema:
+            type: integer
+            default: 1
+        - name: limit
+          in: query
+          description: Limit of results per page
+          schema:
+            type: integer
+            default: 20
+      responses:
+        '200':
+          description: List of transactions
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Transaction'
+                  pagination:
+                    $ref: '#/components/schemas/Pagination'
+
+  /transactions/{id}:
+    get:
+      tags:
+        - Transaction
+      summary: Search transaction 
+      description: |
+        Allows you to retrieve information about a specific transaction by entering its ID.
+      operationId: buscarTransacao
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Transaction ID
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Transaction data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Transaction'
+        '404':
+          description: Transaction not found
+
+    post:
+      tags:
+        - Transaction
+      summary: Refund transaction
+      description: |
+        Allows you to request a refund for a transaction that has already been processed.
+      operationId: estornarTransacao
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Transaction ID
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                amount:
+                  type: integer
+                  description: |
+                    Amount to be refunded in cents (optional; if not specified, the total amount will be refunded)
+      responses:
+        '200':
+          description: Refund requested successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Transaction'
+        '400':
+          description: Invalid request
+        '404':
+          description: Transaction not found
+
+    put:
+      tags:
+        - Transaction
+      summary: Change delivery status
+      description: |
+        Allows you to change the delivery status of a specific transaction.
+      operationId: alterarStatusEntrega
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Transaction ID
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - deliveryStatus
+              properties:
+                deliveryStatus:
+                  type: string
+                  description: New delivery status
+      responses:
+        '200':
+          description: Delivery status updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Transaction'
+
+  /customers:
+    post:
+      tags:
+        - Clientes
+      summary: Criar cliente
+      description: |
+        O endpoint /customers permite cadastrar um novo cliente na plataforma.
+      operationId: criarCliente
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Customer'
+      responses:
+        '200':
+          description: Cliente criado com sucesso
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Customer'
+        '400':
+          description: Requisição inválida
+
+    get:
+      tags:
+        - Clientes
+      summary: Listar clientes
+      description: |
+        Permite obter uma lista de clientes cadastrados na plataforma, com suporte a filtros para facilitar a busca.
+      operationId: listarClientes
+      parameters:
+        - name: page
+          in: query
+          description: Número da página
+          schema:
+            type: integer
+            default: 1
+        - name: limit
+          in: query
+          description: Limite de resultados por página
+          schema:
+            type: integer
+            default: 20
+        - name: search
+          in: query
+          description: Buscar por nome, email ou documento
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Lista de clientes
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Customer'
+                  pagination:
+                    $ref: '#/components/schemas/Pagination'
+
+  /customers/{id}:
+    get:
+      tags:
+        - Clientes
+      summary: Buscar cliente
+      description: |
+        Permite recuperar as informações de um cliente específico cadastrado na plataforma.
+      operationId: buscarCliente
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID do cliente
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Dados do cliente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Customer'
+        '404':
+          description: Cliente não encontrado
+
+    put:
+      tags:
+        - Clientes
+      summary: Atualizar cliente
+      description: |
+        O endpoint /customers/{id} permite atualizar as informações de um cliente já cadastrado.
+      operationId: atualizarCliente
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID do cliente
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Customer'
+      responses:
+        '200':
+          description: Cliente atualizado com sucesso
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Customer'
+        '404':
+          description: Cliente não encontrado
+
+  /balance:
+    get:
+      tags:
+        - Financeiro
+      summary: Consultar saldo e reserva
+      description: |
+        Para consultar o saldo disponível, utilize a rota `/balance`.
+      operationId: consultarSaldo
+      responses:
+        '200':
+          description: Dados de saldo e reserva
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  available:
+                    type: integer
+                    description: Saldo disponível em centavos
+                  reserved:
+                    type: integer
+                    description: Valor reservado em centavos
+                  total:
+                    type: integer
+                    description: Saldo total em centavos
+        '400':
+          description: Requisição inválida
+  
+  /company:
+    get:
+      tags:
+        - Conta
+      summary: Dados da empresa
+      description: |
+        O endpoint /company permite obter informações gerais sobre a empresa cadastrada na plataforma.
+      operationId: dadosEmpresa
+      responses:
+        '200':
+          description: Dados da empresa
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    format: uuid
+                  name:
+                    type: string
+                  document:
+                    type: string
+                  email:
+                    type: string
+                  phone:
+                    type: string
+                  createdAt:
+                    type: string
+                    format: date-time
+        '400':
+          description: Requisição inválida
+
+  /cashout:
+    post:
+      tags:
+        - Cashout
+      summary: Solicitar saque
+      description: |
+        Realizar um saque do saldo disponível para uma chave Pix.
+
+        A **x-api-key** necessária para autenticação pode ser encontrada no Gateway, em Integrações → Chave de API.
+      operationId: solicitarSaque
+      security:
+        - ApiKeyAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SolicitarSaque'
+            example:
+              requestedamount: 2000
+              pixkey: "11911111111"
+              type: "PHONE"
+              description: "Saque Cashout"
+      responses:
+        '200':
+          description: Saque realizado com sucesso
+        '400':
+          description: Requisição inválida
+        '401':
+          description: Não autorizado
+        '500':
+          description: Erro interno do servidor
+
+components:
+  securitySchemes:
+    basicAuth:
+        type: http
+        scheme: basic
+        description: |
+          Autenticação usando Basic Authentication. 
+          Use sua SECRET_KEY como usuário e "x" como senha, ou encode no formato "SECRET_KEY:x" em base64.
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: x-api-key
+      description: Token de autenticação fornecido no Gateway, localizado em Integrações → Chave de API.
+
+    # BearerAuth:
+    #   type: http
+    #   scheme: bearer
+    #   bearerFormat: JWT
+    #   description: |
+    #     Autenticação usando Bearer Authentication.
+    #     Para acessar os recursos da API, é necessário autenticar-se utilizando o método **Basic Authentication**, fornecendo sua chave secreta como credencial.
+
+  schemas:
+    Postback:
+      type: object
+      description: |
+        Ao registrar uma transação, é possível definir uma URL específica para receber notificações 
+        sempre que houver atualizações no status da transação. Para isso, utilize o campo `postbackUrl`. 
+        Os dados enviados para essa URL seguirão o formato apresentado abaixo.
+      properties:
+        id:
+          type: string
+          description: ID do evento de postback
+        type:
+          type: string
+          enum: [transaction]
+          description: Tipo do evento
+        objectId:
+          type: string
+          format: uuid
+          description: ID do objeto relacionado (transação)
+        data:
+          $ref: '#/components/schemas/Transaction'
+
+    Transaction:
+      type: object
+      description: |
+        Ao criar uma transação, este é o objeto que você recebe como resposta. 
+        Você também receberá esse objeto quando ocorrer uma atualização de status da transação no seu postbackUrl.
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: ID da transação
+        status:
+          type: string
+          enum: [processing, authorized, paid, refunded, waiting_payment, refused, chargedback, canceled, in_protest, partially_paid]
+          description: Status da transação
+        amount:
+          type: string
+          description: |
+            Valor da transação em centavos. Exemplo: R$ 5,00 = 500
+        paidAmount:
+          type: integer
+          description: Valor pago em centavos
+        refundedAmount:
+          type: integer
+          description: Valor estornado em centavos
+        paymentMethod:
+          type: string
+          enum: [CARD, PIX, BOLETO]
+          description: Meio de pagamento utilizado na transação
+        installments:
+          type: integer
+          description: Quantidade de parcelas da transação
+        customer:
+          $ref: '#/components/schemas/Customer'
+        shipping:
+          $ref: '#/components/schemas/Shipping'
+        card:
+          $ref: '#/components/schemas/Card'
+        pix:
+          $ref: '#/components/schemas/Pix'
+        boleto:
+          $ref: '#/components/schemas/Boleto'
+        companyId:
+          type: string
+          format: uuid
+          description: ID da empresa que criou a transação
+        postbackUrl:
+          type: string
+          format: uri
+          description: URL de postback que receberá as atualizações de status da transação
+          x-nullable: true
+        metadata:
+          type: object
+          additionalProperties: true
+          description: Objeto com dados adicionais informados na criação da transação
+        createdAt:
+          type: string
+          format: date-time
+          description: Data de criação da transação
+        updatedAt:
+          type: string
+          format: date-time
+          description: Data da última atualização da transação
+        ip:
+          type: string
+          description: |
+            IP de origem que criou a transação, podendo ser diretamente de seu cliente, 
+            caso a requisição venha diretamente do client-side, ou de seus servidores, 
+            caso tudo esteja centralizando em sua aplicação no server-side.
+        refusedReason:
+          $ref: '#/components/schemas/RefusedReason'
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/Item'
+          description: Dados sobre os produtos comprados
+        splits:
+          type: array
+          items:
+            $ref: '#/components/schemas/Split'
+          description: Regras de divisão da transação
+        paidAt:
+          type: string
+          format: date-time
+          x-nullable: true
+        fee:
+          $ref: '#/components/schemas/Fee'
+        description:
+          type: string
+          description: Descrição da transação
+
+    CriarTransacaoRequest:
+      type: object
+      required:
+        - customer
+        - amount
+        - paymentMethod
+      properties:
+        customer:
+          $ref: '#/components/schemas/Customer'
+        amount:
+          type: integer
+          description: Valor da transação em centavos
+        paymentMethod:
+          type: string
+          enum: [CARD, PIX, BOLETO]
+          description: Método de pagamento
+        installments:
+          type: integer
+          description: Número de parcelas (apenas para cartão)
+          default: 1
+        card:
+          type: object
+          properties:
+            hash:
+              type: string
+              description: Token do cartão tokenizado (obtido via Shark Banking SDK)
+        description:
+          type: string
+          description: Descrição da transação
+        postbackUrl:
+          type: string
+          format: uri
+          description: URL para receber notificações de mudança de status
+        metadata:
+          type: object
+          additionalProperties: true
+          description: Dados adicionais em formato JSON
+        shipping:
+          $ref: '#/components/schemas/Shipping'
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/Item'
+
+    Customer:
+      type: object
+      required:
+        - name
+        - email
+        - document
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: ID do cliente
+        name:
+          type: string
+          description: Nome completo do cliente
+        email:
+          type: string
+          format: email
+          description: Email do cliente
+        phone:
+          type: string
+          description: Telefone do cliente (somente números)
+        document:
+          type: object
+          required:
+            - type
+            - number
+          properties:
+            type:
+              type: string
+              enum: [CPF, CNPJ]
+              description: Tipo de documento
+            number:
+              type: string
+              description: Número do documento (somente números)
+        createdAt:
+          type: string
+          format: date-time
+          description: Data de criação do cliente
+
+    Shipping:
+      type: object
+      properties:
+        street:
+          type: string
+          description: Nome da rua
+        streetNumber:
+          type: string
+          description: Número do endereço
+        complement:
+          type: string
+          description: Complemento do endereço
+        neighborhood:
+          type: string
+          description: Bairro
+        city:
+          type: string
+          description: Cidade
+        state:
+          type: string
+          description: Estado (2 letras)
+        zipCode:
+          type: string
+          description: CEP (somente números)
+        country:
+          type: string
+          default: BR
+          description: País
+
+    Card:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        last4:
+          type: string
+          description: Últimos 4 dígitos do cartão
+        brand:
+          type: string
+          description: Bandeira do cartão
+        holderName:
+          type: string
+          description: Nome do portador do cartão
+
+    Pix:
+      type: object
+      properties:
+        qrcode:
+          type: string
+          format: uri
+          description: URL do QR Code para pagamento
+        expirationDate:
+          type: string
+          format: date-time
+          description: Data de expiração do PIX
+        end2EndId:
+          type: string
+          description: ID end-to-end da transação PIX
+          x-nullable: true
+        receiptUrl:
+          type: string
+          format: uri
+          description: URL do comprovante de pagamento
+          x-nullable: true
+
+    Boleto:
+      type: object
+      properties:
+        barcode:
+          type: string
+          description: Código de barras do boleto
+        ourNumber:
+          type: string
+          description: Nosso número do boleto
+        expirationDate:
+          type: string
+          format: date
+          description: Data de vencimento do boleto
+        pdfUrl:
+          type: string
+          format: uri
+          description: URL do PDF do boleto
+
+    RefusedReason:
+      type: object
+      description: |
+        Quando uma transação no cartão de crédito for recusada, 
+        esse campo estará preenchido com o motivo da recusa.
+      properties:
+        code:
+          type: string
+          description: Código do motivo da recusa
+        message:
+          type: string
+          description: Mensagem descritiva do motivo da recusa
+
+    Item:
+      type: object
+      properties:
+        title:
+          type: string
+          description: Título do produto
+        unitPrice:
+          type: integer
+          description: Preço unitário em centavos
+        quantity:
+          type: integer
+          description: Quantidade
+        externalRef:
+          type: string
+          description: Referência externa do produto
+
+    Split:
+      type: object
+      description: Regra de divisão da transação
+      properties:
+        recipientId:
+          type: string
+          format: uuid
+          description: ID do recebedor
+        percentage:
+          type: number
+          format: float
+          description: Percentual da divisão
+        netAmount:
+          type: integer
+          description: Valor líquido em centavos
+      example:
+        recipientId: "909c81fe-0511-442c-b2a8-ca06b0fd8042"
+        percentage: 100
+        netAmount: 200
+
+    Fee:
+      type: object
+      properties:
+        fixedAmount:
+          type: integer
+          description: Taxa fixa em centavos
+        spreadPercentage:
+          type: number
+          format: float
+          description: Percentual de spread
+        estimatedFee:
+          type: integer
+          description: Taxa estimada em centavos
+        netAmount:
+          type: integer
+          description: Valor líquido em centavos
+
+    Pagination:
+      type: object
+      properties:
+        page:
+          type: integer
+          description: Página atual
+        limit:
+          type: integer
+          description: Limite por página
+        total:
+          type: integer
+          description: Total de registros
+        totalPages:
+          type: integer
+          description: Total de páginas
+
+    SolicitarSaque:
+      type: object
+      required:
+        - requestedamount
+        - pixkey
+        - type
+      properties:
+        requestedamount:
+          type: integer
+          description: Valor da transação em centavos
+        pixkey:
+          type: string
+          description: Chave Pix para onde o valor será transferido
+        type:
+          type: string
+          enum: [CPF, CNPJ, PHONE, EMAIL, EVP]
+        description:
+          type: string
+          description: Descrição da transação
