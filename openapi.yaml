@@ -628,6 +628,22 @@ components:
           type: array
           items:
             $ref: '#/components/schemas/Item'
+        split:
+          type: object
+          description: Regra de divisão da transação
+          properties:
+            recipient_id:
+              type: string
+              format: uuid
+              description: ID do recebedor
+            amount:
+              type: number
+              format: integer
+              description: Valor percentual a ser splitado
+            fixed:
+              type: number
+              format: integer
+              description: Valor fixo a ser splitado
 
     Customer:
       type: object
