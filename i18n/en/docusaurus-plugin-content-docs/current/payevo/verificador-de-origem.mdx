@@ -1,0 +1,270 @@
+---
+id: verificador-de-origem
+title: Origin Verifier
+slug: /verificador-de-origem
+---
+
+# Origin Verifier
+
+#### Script for automatic capture of transaction origin data.
+
+---
+
+The Origin Verifier is a script that must be included on your checkout page. It automatically collects information such as the page URL, store domain, and buyer's browser, generating a digital signature (fingerprint) for validation.
+
+This data is sent in the `metadata.origin` field when creating a transaction, allowing the gateway to identify the source of each payment.
+
+The script uses the same **API Token** you already have for API authentication.
+
+---
+
+## Installation
+
+Add the tag below to your checkout page, **before** your payment code. Replace `{SECRET_KEY}` with your API key:
+
+```html
+<script
+    src="https://cdn.payevo.com.br/origin/v1/payevo-origin.min.js"
+    data-token="{SECRET_KEY}">
+</script>
+```
+
+The script loads automatically and requires no additional configuration. After loading, the origin data becomes available through the `window.PayEvoOrigin.getData()` function.
+
+---
+
+## Usage
+
+When building the transaction creation request body, retrieve the origin data and include it in the `metadata.origin` field:
+
+```javascript
+const origin = window.PayEvoOrigin ? window.PayEvoOrigin.getData() : null;
+
+const options = {
+    method: "POST",
+    url: "https://apiv2.payevo.com.br/functions/v1/transactions",
+    headers: {
+        "Content-Type": "application/json",
+        authorization: 'Basic ' + new Buffer("{SECRET_KEY}").toString('base64')
+    },
+    body: JSON.stringify({
+        amount: 5000,
+        paymentMethod: "CARD",
+        card: {
+            hash: "token_do_cartao_tokenizado"
+        },
+        customer: {
+            name: "João Silva",
+            email: "joao@email.com",
+            document: { type: "CPF", number: "12345678900" }
+        },
+        metadata: {
+            order_id: "PEDIDO-456",
+            ...(origin && { origin })
+        }
+    })
+};
+```
+
+The check `window.PayEvoOrigin ? ... : null` ensures that if the script has not been loaded, the transaction will be processed normally without the origin data.
+
+---
+
+## Request body
+
+### With origin data
+
+When the script is installed, the `metadata.origin` field is automatically populated with the collected data:
+
+```JSON
+{
+    "amount": 5000,
+    "paymentMethod": "CARD",
+    "card": {
+        "hash": "token_do_cartao_tokenizado"
+    },
+    "customer": {
+        "name": "João Silva",
+        "email": "joao@email.com",
+        "document": {
+            "type": "CPF",
+            "number": "12345678900"
+        }
+    },
+    "metadata": {
+        "order_id": "PEDIDO-456",
+        "origin": {
+            "page_url": "https://minhaloja.com/checkout/456",
+            "page_domain": "minhaloja.com",
+            "referrer_url": "https://minhaloja.com/produto/camiseta-azul",
+            "shop_url": "minhaloja.com",
+            "user_agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+            "collected_at": "2026-03-31T14:00:00.000Z",
+            "fingerprint": "a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5f6a1b2"
+        }
+    }
+}
+```
+
+### Without origin data
+
+If the script is not installed, the transaction is sent normally without the `origin` field:
+
+```JSON
+{
+    "amount": 5000,
+    "paymentMethod": "CARD",
+    "card": {
+        "hash": "token_do_cartao_tokenizado"
+    },
+    "customer": {
+        "name": "João Silva",
+        "email": "joao@email.com",
+        "document": {
+            "type": "CPF",
+            "number": "12345678900"
+        }
+    },
+    "metadata": {
+        "order_id": "PEDIDO-789"
+    }
+}
+```
+
+---
+
+## Collected fields
+
+| Field | Description |
+|---|---|
+| `page_url` | Full URL of the checkout page |
+| `page_domain` | Page domain |
+| `referrer_url` | Previous page URL (where the buyer came from) |
+| `shop_url` | Store domain |
+| `user_agent` | Browser and operating system identification |
+| `collected_at` | Collection date and time in ISO 8601 format (UTC) |
+| `fingerprint` | HMAC-SHA256 signature generated from the collected data |
+
+---
+
+## Platform integration
+
+### HTML
+
+Include the script tag in the `<head>` or before the `</body>` of your checkout page:
+
+```html
+<head>
+    <script
+        src="https://cdn.payevo.com.br/origin/v1/payevo-origin.min.js"
+        data-token="{SECRET_KEY}">
+    </script>
+</head>
+```
+
+In the payment event, collect the data and include it in the request body:
+
+```javascript
+document.getElementById('btn-pagar').addEventListener('click', async () => {
+    const origin = window.PayEvoOrigin ? window.PayEvoOrigin.getData() : null;
+
+    const response = await fetch('https://apiv2.payevo.com.br/functions/v1/transactions', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Basic ' + btoa('{SECRET_KEY}')
+        },
+        body: JSON.stringify({
+            amount: 5000,
+            paymentMethod: 'CARD',
+            card: {
+                hash: 'token_do_cartao_tokenizado'
+            },
+            customer: {
+                name: 'João Silva',
+                email: 'joao@email.com',
+                document: { type: 'CPF', number: '12345678900' }
+            },
+            metadata: {
+                order_id: 'PEDIDO-456',
+                ...(origin && { origin })
+            }
+        })
+    });
+});
+```
+
+### React / Next.js
+
+In **Next.js**, add the script to your layout or page using the `<Script>` component:
+
+```tsx
+import Script from 'next/script';
+
+export default function CheckoutLayout({ children }) {
+    return (
+        <>
+            <Script
+                src="https://cdn.payevo.com.br/origin/v1/payevo-origin.min.js"
+                data-token="{SECRET_KEY}"
+                strategy="beforeInteractive"
+            />
+            {children}
+        </>
+    );
+}
+```
+
+For **React (CRA)** projects, add the tag directly in `public/index.html`:
+
+```html
+<script
+    src="https://cdn.payevo.com.br/origin/v1/payevo-origin.min.js"
+    data-token="{SECRET_KEY}">
+</script>
+```
+
+In the checkout component, access the origin data at the time of payment:
+
+```tsx
+const handlePayment = async () => {
+    const origin = window.PayEvoOrigin?.getData() ?? null;
+
+    const response = await fetch('https://apiv2.payevo.com.br/functions/v1/transactions', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Basic ' + btoa('{SECRET_KEY}')
+        },
+        body: JSON.stringify({
+            amount: 5000,
+            paymentMethod: 'CARD',
+            card: {
+                hash: 'token_do_cartao_tokenizado'
+            },
+            customer: {
+                name: 'João Silva',
+                email: 'joao@email.com',
+                document: { type: 'CPF', number: '12345678900' }
+            },
+            metadata: {
+                order_id: 'PEDIDO-456',
+                ...(origin && { origin })
+            }
+        })
+    });
+};
+```
+
+### Shopify
+
+In the Shopify dashboard, go to **Online Store → Themes**, find your active theme and click **Edit code**. Open the `theme.liquid` file and add the following tag before `</head>`:
+
+```html
+<script
+    src="https://cdn.payevo.com.br/origin/v1/payevo-origin.min.js"
+    data-token="{SECRET_KEY}">
+</script>
+```
+
+For **Shopify Plus** stores, the script can be added directly to the checkout. Go to **Settings → Checkout**, find the **Additional scripts** field and insert the same tag above.
