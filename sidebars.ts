@@ -42,7 +42,8 @@ const sidebars: SidebarsConfig = {
       collapsed: false,
       items: [
         { type: 'doc', id: 'payevo/introducao' },
-        { type: 'doc', id: 'payevo/formato-dos-postbacks' }
+        { type: 'doc', id: 'payevo/formato-dos-postbacks' },
+        { type: 'doc', id: 'payevo/verificador-de-origem' }
       ]
     },
     // Injeta a sidebar da API já normalizada
