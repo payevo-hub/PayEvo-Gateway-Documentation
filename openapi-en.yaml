@@ -442,6 +442,7 @@ paths:
               pixkey: "11911111111"
               type: "PHONE"
               description: "Saque Cashout"
+              postbackUrl: "https://example.com/webhooks/cashout"
       responses:
         '200':
           description: Withdrawal successfully
@@ -868,3 +869,7 @@ components:
         description:
           type: string
           description: Description of the withdrawal request
+        postbackUrl:
+          type: string
+          format: uri
+          description: URL to receive status change notifications
